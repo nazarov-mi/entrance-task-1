@@ -4,13 +4,14 @@ scalar Date
 type User {
     id: ID!
     login: String!
-    homeFloor: Int
+    homeFloor: Int!
     avatarUrl: String!
 }
 
 input UserInput {
     login: String!
-    homeFloor: Int
+    homeFloor: Int!
+    avatarUrl: String!
 }
 
 type UserRoom {
@@ -64,15 +65,13 @@ type Mutation {
   updateRoom(id: ID!, input: RoomInput!): Room
   removeRoom(id: ID!): Room
 
-  createEvent(input: EventInput!, usersIds: [ID], roomId: ID!): Event
-  updateEvent(id: ID!, input: EventInput!): Event
+  createEvent(input: EventInput!, usersIds: [ID]!, roomId: ID!): Event
+  updateEvent(id: ID!, input: EventInput!, usersIds: [ID], roomId: ID): Event
   removeUserFromEvent(id: ID!, userId: ID!): Event
   addUserToEvent(id: ID!, userId: ID!): Event
   changeEventRoom(id: ID!, roomId: ID!): Event
   removeEvent(id: ID!): Event
 }
-
-union SearchResult = User | Event | Room
 
 schema {
   query: Query

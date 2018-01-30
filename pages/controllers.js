@@ -7,5 +7,5 @@ module.exports.index = function (req, res) {
       </head>
       <h1>Hello</h1>
     </html>
-    `);
+   `);
 };

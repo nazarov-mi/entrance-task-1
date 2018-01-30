@@ -39,32 +39,62 @@ module.exports = {
   createEvent (root, { input, usersIds, roomId }, context) {
     return models.Event.create(input)
             .then(event => {
-              event.setRoom(roomId);
-
-              return event.setUsers(usersIds)
-                    .then(() => event);
+              return Promise.all([
+                event.setUsers(usersIds),
+                event.setRoom(roomId)
+              ])
+                .then(() => event);
             });
   },
 
-  updateEvent (root, { id, input }, context) {
+  updateEvent (root, { id, input, usersIds, roomId }, context) {
     return models.Event.findById(id)
             .then(event => {
-              return event.update(input);
+              const promises = [
+                event.update(input)
+              ];
+
+              if (usersIds) {
+                promises.push(event.setUsers(usersIds));
+              }
+
+              if (roomId) {
+                promises.push(event.setRoom(roomId));
+              }
+
+              return Promise.all(promises)
+                .then(([event]) => event)
             });
   },
 
   removeUserFromEvent (root, { id, userId }, context) {
     return models.Event.findById(id)
             .then(event => {
-              event.removeUser(userId);
-              return event;
+              return event.removeUser(userId)
+                .then(() => event)
             });
+  },
+
+  addUserToEvent (root, { id, userId }, context) {
+    return models.Event.findById(id)
+            .then(event => {
+              return event.hasUser(userId)
+                .then(has => {
+                  if (has) {
+                    return event
+                  }
+
+                  return event.addUser(userId)
+                    .then(() => event)
+                })
+            })
   },
 
   changeEventRoom (root, { id, roomId }, context) {
     return models.Event.findById(id)
             .then(event => {
-              event.setRoom(id);
+              return event.setRoom(roomId)
+                .then(() => event)
             });
   },
 
